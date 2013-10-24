@@ -13,16 +13,24 @@ body {
 	shape-rendering: crispEdges;
 }
 
+text {
+	border: 50px;
+	fill:black;
+}
 .x.axis path {
 	display: none;
 }
 </style>
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<p class="stari">Staří.</p>
+<p class="nezamestnani">Nezamestnani.</p>
 <script>
 
-var width = 300,
+var width = 600,
 	height = 650;
+var xvolby = [];
+var scenar2 = [];
 
 var strany = {"obcane_cz":0, "liberalove_cz":0, "VV":0, "konzerv_strana":0, "KSCM":0, "koruna_ceska":0, "CSNS":0, "CSSD":0, "narodni_prosperita":0, "sdruzeni_pro_rep":0, "moravane":0, "SPOZ":0, "STOP":0, "TOP09":0, "evropsky_stred":0, "KDU-CSL":0, "cibulka":0, "CS_narod_socialisticka":0, "zeleni":0, "suverenita_bobo":0, "humanisticka_str":0, "pirati":0, "DSSS":0, "svobodni":0, "ODS":0, "klicove_hnuti":0};
 
@@ -36,7 +44,8 @@ var svg = d3.select("body").append("svg")
 		.attr("height", height + 60);
 
 
-var yscale = d3.scale.linear()
+var yscale = d3.scale.pow()
+		.exponent(.25)
 		.domain([0, 30])
 		.range([0, height - 40]);
 
@@ -61,38 +70,78 @@ function procenta(filtered) {
 		return out
 }
 
+function updateChart(podminka) {
+	var vysledkyFilter = xvolby.filter(function(e){return podminka(e)});
+	var scenar = procenta(vysledkyFilter)					
+
+	svg.selectAll("text.scenar")
+		.data(scenar)
+		.transition()
+		.duration(700)
+		.attr("y", function(d) { return height - yscale(d)})
+		.text(function(d,i) {return partaje[i] + " " + Math.round(d) + " %"});		
+
+	svg.selectAll("line")
+		.data(scenar2)
+		.transition()
+		.duration(700)
+		.attr("y1", function(d) { return height - yscale(d)})
+		.attr("y2", function(d, i) { return height - yscale(scenar[i])})
+		.attr("stroke", function(d, i) {
+			if (d >= scenar[i]) {
+				return "red"
+			} else {
+				return "green"
+			}
+	});
+				};
+
 d3.csv("volby10.csv", function(error, volby) {
-	var vysledkyFilter = volby.filter(function(e){return e.vek_prumer > 50});
+	xvolby = volby
+	var vysledkyFilter = volby.filter(function(e){return e.vek_prumer > 1});
 
 	var scenar = procenta(vysledkyFilter)
-	var scenar2 = procenta(volby)
+	scenar2 = procenta(volby)
 
 svg.selectAll("text")
 	.data(scenar2)
 	.enter().append("text")
 	.attr("x", 50)
 	.attr("y", function(d) { return height - yscale(d)})
-	.text(function(d,i) {return partaje[i] + " " + Math.ceil(d) + " %"});	
+	.text(function(d,i) {return partaje[i] + " " + Math.round(d) + " %"});	
 
 
-svg.selectAll("text .scenar")
+svg.selectAll("text.scenar")
 	.data(scenar)
 	.enter().append("text")
-	.attr("x", 250)
+	.attr("x", 450)
+	.attr("class", "scenar")
 	.attr("y", function(d) { return height - yscale(d)})
-	.text(function(d,i) {return partaje[i] + " " + Math.ceil(d) + " %"});		
+	.text(function(d,i) {return partaje[i] + " " + Math.round(d) + " %"});		
 
 svg.selectAll("g")
 	.data(scenar2)
 	.enter()
 	.append("line")
-	.attr("x1", 110)
+	.attr("x1", 140)
 	.attr("y1", function(d) { return height - yscale(d)})
-	.attr("x2", 248)
+	.attr("x2", 448)
 	.attr("y2", function(d, i) { return height - yscale(scenar[i])})
 	.attr("stroke-width", 1)
-	.attr("stroke", "black");
+	.attr("stroke", function(d, i) {
+		if (d > scenar[i]) {
+			return "red"
+		} else if (d < scenar[i]) {
+			return "green"
+		} else {
+			return "gray"
+		}
+	});
 
 });
+
+d3.select("p.stari").on("click", function() {updateChart(function(e){return e.vek_prumer > 60})})
+d3.select("p.nezamestnani").on("click", function() {updateChart(function(e){return e.MIRA_NEZAM > 15})})
+
 
 </script>

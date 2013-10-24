@@ -23,12 +23,15 @@ text {
 </style>
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
-<p class="stari">Staří.</p>
-<p class="nezamestnani">Nezamestnani.</p>
+<p class="stari">Staří</p>
+<p class="nezamestnani">Nezamestnani</p>
+<p class="krimi">Kriminální</p>
+<p class="hustot">Hustota obyvatel</p>
+
 <script>
 
 var width = 600,
-	height = 650;
+	height = 500;
 var xvolby = [];
 var scenar2 = [];
 
@@ -140,8 +143,10 @@ svg.selectAll("g")
 
 });
 
-d3.select("p.stari").on("click", function() {updateChart(function(e){return e.vek_prumer > 60})})
+d3.select("p.stari").on("click", function() {updateChart(function(e){return e.vek_prumer >= 50})})
 d3.select("p.nezamestnani").on("click", function() {updateChart(function(e){return e.MIRA_NEZAM > 15})})
+d3.select("p.krimi").on("click", function() {updateChart(function(e){return e.crimeRate > .05})})
+d3.select("p.hustot").on("click", function() {updateChart(function(e){return e.hustotaObyv > .000120016285})})
 
 
 </script>

@@ -25,58 +25,94 @@ body {
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
-var width = 670,
-		height = 350;
+var width = 300,
+		height = 650;
 
-var strany = {"obcane_cz":0, "liberalove_cz":0, "VV":0, "konzerv_strana":0, "KSCM":0, "koruna_ceska":0, "CSNS":0, "CSSD":0, "narodni_prosperita":0, "sdruzeni_pro_rep":0, "moravane":0, "SPOZ":0, "STOP":0, "TOP09":0, "evropsky_stred":0, "KDU-CSL":0, "cibulka":0, "CS_narod_socialisticka":0, "zeleni":0, "suverenita_bobo":0, "humanisticka_str":0, "pirati":0, "DSSS":0, "svobodni":0, "ODS":0, "klicove_hnuti":0};    
+var strany = {"obcane_cz":0, "liberalove_cz":0, "VV":0, "konzerv_strana":0, "KSCM":0, "koruna_ceska":0, "CSNS":0, "CSSD":0, "narodni_prosperita":0, "sdruzeni_pro_rep":0, "moravane":0, "SPOZ":0, "STOP":0, "TOP09":0, "evropsky_stred":0, "KDU-CSL":0, "cibulka":0, "CS_narod_socialisticka":0, "zeleni":0, "suverenita_bobo":0, "humanisticka_str":0, "pirati":0, "DSSS":0, "svobodni":0, "ODS":0, "klicove_hnuti":0};
+
+partaje = []
+
+for (partaj in strany) {
+	partaje.push(partaj)
+}    
 
 var svg = d3.select("body").append("svg")
-		.attr("width", width)
-		.attr("height", height);
+		.attr("width", width + 60)
+		.attr("height", height + 60);
 
 var  celkem = 0
+var celkem2 = 0
 
- var yscale = d3.scale.linear()
-	.domain([0, 100])
-	.range([0, height]);
+ var yscale = d3.scale.sqrt()
+ .exponent(.5)
+	.domain([0, 50])
+	.range([0, height - 40]);
 
- var svg = d3.select("body").append("svg")
-	.attr("width", width )
-	.attr("height", height);
+var soucty
+var vysledky
+var scenar = [];
+var scenar2 = []
 
 d3.csv("volby10.csv", function(error, volby) {
-	var secist = volby.filter(function(e){return e.crimeRate > 0.02});
+	var filtered = volby.filter(function(e){return e.MIRA_NEZAM > 0.1});
 
-	var soucty = (secist.reduce(function(s,e){
+	soucty = (filtered.reduce(function(s,e){
 		for (i in s){
 			s[i] += e[i]*1.0;
 		}
 		return s;
 	},strany));
 
+	vysledky = (volby.reduce(function(s,e){
+		for (i in s){
+			s[i] += e[i]*1.0;
+		}
+		return s;
+	},strany));
 
-	for (i in soucty){
+for (i in soucty){
 		celkem += soucty[i] 
-		soucty[i] = soucty[i]/celkem
+		soucty[i] = (soucty[i]/celkem) * 100
+	}
+for (var k in soucty) {
+		scenar.push(soucty[k] )
 	}
 
-	console.log(soucty)
-	console.log(celkem)
-
-	var cibopole = [];
-	for (var k in soucty) {
-		console.log(k)
-	cibopole.push(soucty[k]*40)
+for (i in vysledky){
+		celkem2 += vysledky[i] 
+		vysledky[i] = (vysledky[i]/celkem2) * 100
 	}
+for (var k in vysledky) {
+		scenar2.push(vysledky[k] )
+	}	
 
-	svg.selectAll(".bar")
-			.data(cibopole)
-			.enter().append("rect")
-			.attr("class", "bar")
-			.attr("x", function(d, i) { return i * 10; })
-			.attr("width", "10px")
-			.attr("y", "0px")
-			.attr("height", function(d) { return yscale(d); });
+	
+	svg.selectAll("text")
+			.data(scenar2)
+			.enter().append("text")
+			.attr("x", 50)
+			.attr("y", function(d) { return height - yscale(d)})
+			.text(function(d,i) {return partaje[i]});	
+
+
+svg.selectAll("text .scenar")
+			.data(scenar)
+			.enter().append("text")
+			.attr("x", 250)
+			.attr("y", function(d) { return height - yscale(d)})
+			.text(function(d,i) {return partaje[i]});		
+
+var lines = svg.selectAll("g")
+			.data(scenar2)
+			.enter()
+			.append("line")
+			.attr("x1", 50)
+			.attr("y1", function(d) { return height - yscale(d)})
+			.attr("x2", 250)
+			.attr("y2", function(d, i) { return height - yscale(scenar[i])})
+			.attr("stroke-width", 2)
+			.attr("stroke", "black");
+
 });
 
 </script>

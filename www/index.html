@@ -37,7 +37,7 @@ var svg = d3.select("body").append("svg")
 
 
 var yscale = d3.scale.linear()
-		.domain([0, 60])
+		.domain([0, 30])
 		.range([0, height - 40]);
 
 function procenta(filtered) {
@@ -49,9 +49,10 @@ function procenta(filtered) {
 		}
 		return s;
 	},strany));
-
 		for (i in soucty){
 			celkem += soucty[i] 
+		}
+		for (i in soucty){
 			soucty[i] = (soucty[i]/celkem) * 100
 		}
 		for (var k in soucty) {
@@ -59,7 +60,6 @@ function procenta(filtered) {
 		}
 		return out
 }
-	
 
 d3.csv("volby10.csv", function(error, volby) {
 	var vysledkyFilter = volby.filter(function(e){return e.vek_prumer > 50});
@@ -72,7 +72,7 @@ svg.selectAll("text")
 	.enter().append("text")
 	.attr("x", 50)
 	.attr("y", function(d) { return height - yscale(d)})
-	.text(function(d,i) {return partaje[i]});	
+	.text(function(d,i) {return partaje[i] + " " + Math.ceil(d) + " %"});	
 
 
 svg.selectAll("text .scenar")
@@ -80,17 +80,17 @@ svg.selectAll("text .scenar")
 	.enter().append("text")
 	.attr("x", 250)
 	.attr("y", function(d) { return height - yscale(d)})
-	.text(function(d,i) {return partaje[i]});		
+	.text(function(d,i) {return partaje[i] + " " + Math.ceil(d) + " %"});		
 
-var lines = svg.selectAll("g")
+svg.selectAll("g")
 	.data(scenar2)
 	.enter()
 	.append("line")
-	.attr("x1", 85)
+	.attr("x1", 110)
 	.attr("y1", function(d) { return height - yscale(d)})
 	.attr("x2", 248)
 	.attr("y2", function(d, i) { return height - yscale(scenar[i])})
-	.attr("stroke-width", 2)
+	.attr("stroke-width", 1)
 	.attr("stroke", "black");
 
 });

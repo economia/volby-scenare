@@ -1,37 +1,63 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-
-body {
-	font: 10px sans-serif;
-}
-
-.axis path,
-.axis line {
-	fill: none;
-	stroke: #000;
-	shape-rendering: crispEdges;
+html, body{
+	margin: 0;
+	font-family: arial, sans-serif;
 }
 
 text {
-	border: 50px;
 	fill:black;
+	font-size: 8px
 }
-.x.axis path {
-	display: none;
+
+#controls {
+	position:absolute;
+	top: 110px;
+	left: 460px;
+	cursor: pointer;
 }
+#controls .control,
+#controls .control span {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	background-color: #67A9CF;
+
+}
+#controls .control td {
+	border-top: 2px solid white;
+	border-right: 2px solid white;
+	padding: 5px;
+	font-size: 11px;
+	display: inline-block;
+	width: 90px;
+}
+
+.selected{
+	color: white;
+}
+
+text.scenar:hover, 
+text.vysledky:hover {
+	font-size: 14px;
+	fill: #67A9CF;
+
+}
+
 </style>
-<body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
-<p class="stari">Staří</p>
-<p class="nezamestnani">Nezamestnani</p>
-<p class="krimi">Kriminální</p>
-<p class="hustot">Hustota obyvatel</p>
-
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<body>
+<table id= "controls">	
+	<tr class= "control"><td class = "stari">Nejstarší obce</td><td class = "mladi">Nejmladší obce</td></tr>
+	<tr class= "control"><td class = "nezamestnani">Nezaměstnaní</td><td class = "zamestnani">Zaměstnaní</td></tr>
+	<tr class= "control"><td class = "krimi">Nejvyšší kriminalita</td><td class = "nekrimi">Nejnižší &nbsp; kriminalita</td></tr>
+	<tr class= "control"><td class = "husti">Největší hustota obyvatel</td><td class = "ridci">Nejmenší hustota obyvatel</td></tr>
+	<tr class= "control"><td class = "zeman">Bašty Miloše Zemana</td><td class = "schwarzenberg">Bašty Karla Schwarzenberga</td></tr>
+</table>
 <script>
-
-var width = 600,
-	height = 500;
+var width = 400,
+	height = 400;
 var xvolby = [];
 var scenar2 = [];
 
@@ -55,6 +81,7 @@ var yscale = d3.scale.pow()
 function procenta(filtered) {
 	var celkem = 0
 	var out = []
+for (i in strany){strany[i]=0;}
 	var soucty = (filtered.reduce(function(s,e){
 		for (i in s){
 			s[i] += e[i] * 1.0;
@@ -71,6 +98,7 @@ function procenta(filtered) {
 			out.push(soucty[k] )
 		}
 		return out
+
 }
 
 function updateChart(podminka) {
@@ -106,10 +134,11 @@ d3.csv("volby10.csv", function(error, volby) {
 	var scenar = procenta(vysledkyFilter)
 	scenar2 = procenta(volby)
 
-svg.selectAll("text")
+svg.selectAll("text.vysledky")
 	.data(scenar2)
 	.enter().append("text")
-	.attr("x", 50)
+	.attr("x", 0)
+	.attr("class", "vysledky")
 	.attr("y", function(d) { return height - yscale(d)})
 	.text(function(d,i) {return partaje[i] + " " + Math.round(d) + " %"});	
 
@@ -117,7 +146,7 @@ svg.selectAll("text")
 svg.selectAll("text.scenar")
 	.data(scenar)
 	.enter().append("text")
-	.attr("x", 450)
+	.attr("x", 330)
 	.attr("class", "scenar")
 	.attr("y", function(d) { return height - yscale(d)})
 	.text(function(d,i) {return partaje[i] + " " + Math.round(d) + " %"});		
@@ -126,9 +155,9 @@ svg.selectAll("g")
 	.data(scenar2)
 	.enter()
 	.append("line")
-	.attr("x1", 140)
+	.attr("x1", 90)
 	.attr("y1", function(d) { return height - yscale(d)})
-	.attr("x2", 448)
+	.attr("x2", 328)
 	.attr("y2", function(d, i) { return height - yscale(scenar[i])})
 	.attr("stroke-width", 1)
 	.attr("stroke", function(d, i) {
@@ -143,10 +172,14 @@ svg.selectAll("g")
 
 });
 
-d3.select("p.stari").on("click", function() {updateChart(function(e){return e.vek_prumer >= 50})})
-d3.select("p.nezamestnani").on("click", function() {updateChart(function(e){return e.MIRA_NEZAM > 15})})
-d3.select("p.krimi").on("click", function() {updateChart(function(e){return e.crimeRate > .05})})
-d3.select("p.hustot").on("click", function() {updateChart(function(e){return e.hustotaObyv > .000120016285})})
-
-
+d3.select(".stari").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.vek_prumer >= 50;})})
+d3.select(".mladi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.vek_prumer >= 50})})
+d3.select(".nezamestnani").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.MIRA_NEZAM > 15})})
+d3.select(".zamestnani").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.MIRA_NEZAM > 15})})
+d3.select(".krimi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.crimeRate > .05})})
+d3.select(".nekrimi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.crimeRate > .05})})
+d3.select(".husti").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
+d3.select(".ridci").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
+d3.select(".zeman").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
+d3.select(".schwarzenberg").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
 </script>

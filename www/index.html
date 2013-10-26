@@ -55,20 +55,41 @@ text.vysledky:hover {
 	<tr class= "control"><td class = "husti">Největší hustota obyvatel</td><td class = "ridci">Nejmenší hustota obyvatel</td></tr>
 	<tr class= "control"><td class = "zeman">Bašty Miloše Zemana</td><td class = "schwarzenberg">Bašty Karla Schwarzenberga</td></tr>
 </table>
+<div id="slope"></div>
+<div id="mapka"><img src="./img/nezamestnani.png"></div>
 <script>
 var width = 400,
 	height = 400;
 var xvolby = [];
 var scenar2 = [];
 
-var strany = {"obcane_cz":0, "liberalove_cz":0, "VV":0, "konzerv_strana":0, "KSCM":0, "koruna_ceska":0, "CSNS":0, "CSSD":0, "narodni_prosperita":0, "sdruzeni_pro_rep":0, "moravane":0, "SPOZ":0, "STOP":0, "TOP09":0, "evropsky_stred":0, "KDU-CSL":0, "cibulka":0, "CS_narod_socialisticka":0, "zeleni":0, "suverenita_bobo":0, "humanisticka_str":0, "pirati":0, "DSSS":0, "svobodni":0, "ODS":0, "klicove_hnuti":0};
+//var strany = {"obcane_cz":0, "liberalove_cz":0, "VV":0, "konzerv_strana":0, "KSCM":0, "koruna_ceska":0, "CSNS":0, "CSSD":0, "narodni_prosperita":0, "sdruzeni_pro_rep":0, "moravane":0, "SPOZ":0, "STOP":0, "TOP09":0, "evropsky_stred":0, "KDU-CSL":0, "cibulka":0, "CS_narod_socialisticka":0, "zeleni":0, "suverenita_bobo":0, "humanisticka_str":0, "pirati":0, "DSSS":0, "svobodni":0, "ODS":0, "klicove_hnuti":0};
+
+var strany = {"VV":0, "konzerv_strana":0, "KSCM":0, "koruna_ceska":0, "CSNS":0, "CSSD":0, "SPOZ":0, "STOP":0, "TOP09":0, "KDU-CSL":0, "zeleni":0, "svobodni":0, "ODS":0};
 
 var partaje = []
 for (partaj in strany) {
 	partaje.push(partaj)
 }    
 
-var svg = d3.select("body").append("svg")
+var columns = []
+
+function secondColumn(y) {
+	dist = 0
+	var a = columns.map(function(e) {
+		return Math.abs(y - e)})
+	for (var i = 0; i < a.length; i++) {
+		if (a[i]<10) {
+			console.log(a[i])
+			dist = 50;
+			break;
+		}
+	}
+	columns.push(y);
+	return dist
+}
+
+var svg = d3.select("#slope").append("svg")
 		.attr("width", width + 60)
 		.attr("height", height + 60);
 
@@ -137,19 +158,20 @@ d3.csv("volby10.csv", function(error, volby) {
 svg.selectAll("text.vysledky")
 	.data(scenar2)
 	.enter().append("text")
-	.attr("x", 0)
+	.attr("x", function(d) { return 0 + ( secondColumn(height - yscale(d)))})
 	.attr("class", "vysledky")
 	.attr("y", function(d) { return height - yscale(d)})
-	.text(function(d,i) {return partaje[i] + " " + Math.round(d) + " %"});	
+	.text(function(d,i) {return partaje[i] + " " + Math.round(d * 10)/10 + " %"});
+columns = []
 
 
 svg.selectAll("text.scenar")
 	.data(scenar)
 	.enter().append("text")
-	.attr("x", 330)
+	.attr("x", function(d) { return 270 + ( secondColumn(height - yscale(d)))})
 	.attr("class", "scenar")
 	.attr("y", function(d) { return height - yscale(d)})
-	.text(function(d,i) {return partaje[i] + " " + Math.round(d) + " %"});		
+	.text(function(d,i) {return partaje[i] + " " + Math.round(d * 10)/ 10 + " %"});		
 
 svg.selectAll("g")
 	.data(scenar2)
@@ -157,14 +179,14 @@ svg.selectAll("g")
 	.append("line")
 	.attr("x1", 90)
 	.attr("y1", function(d) { return height - yscale(d)})
-	.attr("x2", 328)
+	.attr("x2", 265)
 	.attr("y2", function(d, i) { return height - yscale(scenar[i])})
 	.attr("stroke-width", 1)
 	.attr("stroke", function(d, i) {
 		if (d > scenar[i]) {
-			return "red"
+			return "#D7191C"
 		} else if (d < scenar[i]) {
-			return "green"
+			return "#1A9641"
 		} else {
 			return "gray"
 		}
@@ -172,14 +194,16 @@ svg.selectAll("g")
 
 });
 
-d3.select(".stari").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.vek_prumer >= 50;})})
-d3.select(".mladi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.vek_prumer >= 50})})
-d3.select(".nezamestnani").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.MIRA_NEZAM > 15})})
-d3.select(".zamestnani").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.MIRA_NEZAM > 15})})
-d3.select(".krimi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.crimeRate > .05})})
-d3.select(".nekrimi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.crimeRate > .05})})
-d3.select(".husti").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
-d3.select(".ridci").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
-d3.select(".zeman").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
-d3.select(".schwarzenberg").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
+d3.select(".stari").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/stari.png"); updateChart(function(e){return e.vek_prumer >= 50;})})
+d3.select(".mladi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/mladi.png"); updateChart(function(e){return e.vek_prumer >= 50})})
+d3.select(".nezamestnani").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/nezamestnani.png"); updateChart(function(e){return e.MIRA_NEZAM > 15})})
+d3.select(".zamestnani").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/zamestnani.png"); updateChart(function(e){return e.MIRA_NEZAM > 15})})
+d3.select(".krimi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/kriminalni.png"); updateChart(function(e){return e.crimeRate > .05})})
+d3.select(".nekrimi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/nekriminalni.png"); updateChart(function(e){return e.crimeRate > .05})})
+d3.select(".husti").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/hustota_obyv.png"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
+d3.select(".ridci").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/ridke_obyv.png"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
+d3.select(".zeman").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/zeman.png"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
+d3.select(".schwarzenberg").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/schwarzenberg.png"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
 </script>
+</body>
+</html>

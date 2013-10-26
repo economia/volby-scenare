@@ -13,8 +13,20 @@ text {
 
 #controls {
 	position:absolute;
-	top: 110px;
-	left: 460px;
+	top: 0px;
+	left: 0px;
+	cursor: pointer;
+}
+#slope {
+	position:absolute;
+	left: 310px;
+	cursor: pointer;
+}
+
+#mapka {
+	position:absolute;
+	top: 170px;
+	left: 0px;
 	cursor: pointer;
 }
 #controls .control,
@@ -30,7 +42,7 @@ text {
 	padding: 5px;
 	font-size: 11px;
 	display: inline-block;
-	width: 90px;
+	width: 125px;
 }
 
 .selected{
@@ -40,8 +52,6 @@ text {
 text.scenar:hover, 
 text.vysledky:hover {
 	font-size: 14px;
-	fill: #67A9CF;
-
 }
 
 </style>
@@ -51,12 +61,12 @@ text.vysledky:hover {
 <table id= "controls">	
 	<tr class= "control"><td class = "stari">Nejstarší obce</td><td class = "mladi">Nejmladší obce</td></tr>
 	<tr class= "control"><td class = "nezamestnani">Nezaměstnaní</td><td class = "zamestnani">Zaměstnaní</td></tr>
-	<tr class= "control"><td class = "krimi">Nejvyšší kriminalita</td><td class = "nekrimi">Nejnižší &nbsp; kriminalita</td></tr>
-	<tr class= "control"><td class = "husti">Největší hustota obyvatel</td><td class = "ridci">Nejmenší hustota obyvatel</td></tr>
-	<tr class= "control"><td class = "zeman">Bašty Miloše Zemana</td><td class = "schwarzenberg">Bašty Karla Schwarzenberga</td></tr>
+	<tr class= "control"><td class = "krimi">Nejvyšší kriminalita</td><td class = "nekrimi">Nejnižší kriminalita</td></tr>
+	<tr class= "control"><td class = "husti">Největší &nbsp; hustota obyvatel</td><td class = "ridci">Nejmenší hustota obyvatel</td></tr>
+	<tr class= "control"><td class = "zeman">Bašty Zeman</td><td class = "schwarzenberg">Bašty Schwarzenberg</td></tr>
 </table>
 <div id="slope"></div>
-<div id="mapka"><img src="./img/nezamestnani.png"></div>
+<div id="mapka"><img src="./img/cr.png" width="300px"></div>
 <script>
 var width = 400,
 	height = 400;
@@ -65,7 +75,8 @@ var scenar2 = [];
 
 //var strany = {"obcane_cz":0, "liberalove_cz":0, "VV":0, "konzerv_strana":0, "KSCM":0, "koruna_ceska":0, "CSNS":0, "CSSD":0, "narodni_prosperita":0, "sdruzeni_pro_rep":0, "moravane":0, "SPOZ":0, "STOP":0, "TOP09":0, "evropsky_stred":0, "KDU-CSL":0, "cibulka":0, "CS_narod_socialisticka":0, "zeleni":0, "suverenita_bobo":0, "humanisticka_str":0, "pirati":0, "DSSS":0, "svobodni":0, "ODS":0, "klicove_hnuti":0};
 
-var strany = {"VV":0, "konzerv_strana":0, "KSCM":0, "koruna_ceska":0, "CSNS":0, "CSSD":0, "SPOZ":0, "STOP":0, "TOP09":0, "KDU-CSL":0, "zeleni":0, "svobodni":0, "ODS":0};
+var strany = {"ČSSD":0, "ANO":0, "KSČM":0, "TOP 09":0, "Úsvit":0, "ODS":0, "KDU-ČSL":0, "SZ":0, "PS":0, "SSO":0,"SPOZ": 0};
+
 var barvy = {"ČSSD": "#f54200", "SSO": "#005340", "ČPS": "#565656", "TOP 09": "#ae2d9f", "HLAV. VZHŮRU": "#a8cbfc", "ODS": "#005091", "Změna": "#76ce29", "KDU-ČSL": "#fed921", "SPOZ": "#30cfe1", "Úsvit": "#f49e00", "DSSS": "#8e5400", "ANO": "#009ee0", "KSČM": "#ce0000", "SZ": "#489422"}
 
 var partaje = []
@@ -85,7 +96,6 @@ function secondColumn(y) {
 		return Math.abs(y - e)})
 	for (var i = 0; i < a.length; i++) {
 		if (a[i]<10) {
-			console.log(a[i])
 			dist = 50;
 			break;
 		}
@@ -107,14 +117,15 @@ var yscale = d3.scale.pow()
 function procenta(filtered) {
 	var celkem = 0
 	var out = []
-for (i in strany){strany[i]=0;}
+for (i in strany){strany[i]=0;
+}
 	var soucty = (filtered.reduce(function(s,e){
 		for (i in s){
 			s[i] += e[i] * 1.0;
 		}
 		return s;
 	},strany));
-		for (i in soucty){
+			for (i in soucty){
 			celkem += soucty[i] 
 		}
 		for (i in soucty){
@@ -124,7 +135,6 @@ for (i in strany){strany[i]=0;}
 			out.push(soucty[k] )
 		}
 		return out
-
 }
 
 function updateChart(podminka) {
@@ -147,13 +157,15 @@ function updateChart(podminka) {
 		.attr("y1", function(d) { return height - yscale(d)})
 		.attr("y2", function(d, i) { return height - yscale(scenar[i])})
 		.attr("stroke", function(d, i) {
-				getColor(partaje[i])
+				return getColor(partaje[i])
 			});
 				};
 
 d3.csv("volby10.csv", function(error, volby) {
 	xvolby = volby
 	var vysledkyFilter = volby.filter(function(e){return e.vek_prumer > 1});
+
+	
 
 	var scenar = procenta(vysledkyFilter)
 	scenar2 = procenta(volby)

@@ -73,9 +73,8 @@ var width = 400,
 	height = 400;
 var xvolby = [];
 var scenar2 = [];
-var norm = 130000;
 
-var strany = {"ČSSD":0, "ANO":0, "KSČM":0, "TOP 09":0, "Úsvit":0, "ODS":0, "KDU-ČSL":0, "SZ":0, "ČPS":0, "SSO":0,"SPOZ": 0};
+var strany = {"ČSSD":0, "ANO":0, "KSČM":0, "TOP 09":0, "Úsvit":0, "ODS":0, "KDU-ČSL":0, "SZ":0, "ČPS":0, "SSO":0,"SPOZ": 0, "HLAVU VZHŮRU":0, "ROMSKA_STRANA":0, "KAN":0, "ZMĚNA":0, "SSČR":0, "CIBULKA":0, "SUVERENITA":0, "AKTIV NEZAV OBC":0, "OB2011":0, "DSSS":0, "LEV 21":0, "KORUNA": 0};
 
 var barvy = {"ČSSD": "#f54200", "SSO": "#005340", "ČPS": "#565656", "TOP 09": "#ae2d9f", "HLAV. VZHŮRU": "#a8cbfc", "ODS": "#005091", "Změna": "#76ce29", "KDU-ČSL": "#fed921", "SPOZ": "#30cfe1", "Úsvit": "#f49e00", "DSSS": "#8e5400", "ANO": "#009ee0", "KSČM": "#ce0000", "SZ": "#489422"}
 
@@ -129,7 +128,7 @@ for (i in strany){strany[i]=0;
 			celkem += soucty[i] 
 		}
 		for (i in soucty){
-			soucty[i] = (soucty[i]/(celkem + norm) * 100)
+			soucty[i] = (soucty[i]/(celkem) * 100)
 		}
 		for (var k in soucty) {
 			out.push(soucty[k] )
@@ -138,9 +137,10 @@ for (i in strany){strany[i]=0;
 }
 
 function updateChart(podminka) {
-	norm = 0;
 	var vysledkyFilter = xvolby.filter(function(e){return podminka(e)});
 	var scenar = procenta(vysledkyFilter);
+
+	scenar.splice(11, 14)
 
 	svg.selectAll("text.scenar")
 		.data(scenar)
@@ -171,6 +171,9 @@ d3.csv("volby13.csv", function(error, volby) {
 
 	var scenar = procenta(vysledkyFilter)
 	scenar2 = procenta(volby)
+
+	scenar.splice(11, 14)
+	scenar2.splice(11,14)
 
 svg.selectAll("text.vysledky")
 	.data(scenar2)

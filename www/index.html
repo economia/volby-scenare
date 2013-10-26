@@ -147,9 +147,12 @@ function updateChart(podminka) {
 		.transition()
 		.duration(700)
 		.attr("y", function(d) { return height - yscale(d)})
+		.attr("x", function(d) { return 173 + ( secondColumn(height - yscale(d)))})
 		.attr("style", function(d,i){
 		return "fill:" + getColor(partaje[i]) })
-		.text(function(d,i) {return partaje[i] + " " + Math.round(d * 10)/10 + " %"});		
+		.text(function(d,i) {return partaje[i] + " " + Math.round(d * 10)/10 + " %"});	
+
+columns = []	
 
 	svg.selectAll("line")
 		.data(scenar2)
@@ -189,7 +192,9 @@ svg.selectAll("text.scenar")
 	.attr("y", function(d) { return height - yscale(d)})
 	.attr("style", function(d,i){
 		return "fill:" + getColor(partaje[i]) })
-	.text(function(d,i) {return partaje[i] + " " + Math.round(d * 10)/ 10 + " %"});		
+	.text(function(d,i) {return partaje[i] + " " + Math.round(d * 10)/ 10 + " %"});
+
+columns = []		
 
 svg.selectAll("g")
 	.data(scenar2)

@@ -73,9 +73,7 @@ var width = 400,
 var xvolby = [];
 var scenar2 = [];
 
-//var strany = {"obcane_cz":0, "liberalove_cz":0, "VV":0, "konzerv_strana":0, "KSCM":0, "koruna_ceska":0, "CSNS":0, "CSSD":0, "narodni_prosperita":0, "sdruzeni_pro_rep":0, "moravane":0, "SPOZ":0, "STOP":0, "TOP09":0, "evropsky_stred":0, "KDU-CSL":0, "cibulka":0, "CS_narod_socialisticka":0, "zeleni":0, "suverenita_bobo":0, "humanisticka_str":0, "pirati":0, "DSSS":0, "svobodni":0, "ODS":0, "klicove_hnuti":0};
-
-var strany = {"ČSSD":0, "ANO":0, "KSČM":0, "TOP 09":0, "Úsvit":0, "ODS":0, "KDU-ČSL":0, "SZ":0, "PS":0, "SSO":0,"SPOZ": 0};
+var strany = {"ČSSD":0, "ANO":0, "KSČM":0, "TOP 09":0, "Úsvit":0, "ODS":0, "KDU-ČSL":0, "SZ":0, "ČPS":0, "SSO":0,"SPOZ": 0};
 
 var barvy = {"ČSSD": "#f54200", "SSO": "#005340", "ČPS": "#565656", "TOP 09": "#ae2d9f", "HLAV. VZHŮRU": "#a8cbfc", "ODS": "#005091", "Změna": "#76ce29", "KDU-ČSL": "#fed921", "SPOZ": "#30cfe1", "Úsvit": "#f49e00", "DSSS": "#8e5400", "ANO": "#009ee0", "KSČM": "#ce0000", "SZ": "#489422"}
 
@@ -139,7 +137,7 @@ for (i in strany){strany[i]=0;
 
 function updateChart(podminka) {
 	var vysledkyFilter = xvolby.filter(function(e){return podminka(e)});
-	var scenar = procenta(vysledkyFilter)					
+	var scenar = procenta(vysledkyFilter)
 
 	svg.selectAll("text.scenar")
 		.data(scenar)
@@ -161,14 +159,13 @@ function updateChart(podminka) {
 			});
 				};
 
-d3.csv("volby10.csv", function(error, volby) {
+d3.csv("volby13.csv", function(error, volby) {
 	xvolby = volby
 	var vysledkyFilter = volby.filter(function(e){return e.vek_prumer > 1});
 
 	
-
-	var scenar = procenta(vysledkyFilter)
 	scenar2 = procenta(volby)
+	var scenar = scenar2
 
 svg.selectAll("text.vysledky")
 	.data(scenar2)
@@ -207,16 +204,16 @@ svg.selectAll("g")
 
 });
 
-d3.select(".stari").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/stari.png"); updateChart(function(e){return e.vek_prumer >= 50;})})
-d3.select(".mladi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/mladi.png"); updateChart(function(e){return e.vek_prumer >= 50})})
-d3.select(".nezamestnani").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/nezamestnani.png"); updateChart(function(e){return e.MIRA_NEZAM > 15})})
-d3.select(".zamestnani").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/zamestnani.png"); updateChart(function(e){return e.MIRA_NEZAM > 15})})
-d3.select(".krimi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/kriminalni.png"); updateChart(function(e){return e.crimeRate > .05})})
-d3.select(".nekrimi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/nekriminalni.png"); updateChart(function(e){return e.crimeRate > .05})})
-d3.select(".husti").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/hustota_obyv.png"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
-d3.select(".ridci").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/ridke_obyv.png"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
-d3.select(".zeman").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/zeman.png"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
-d3.select(".schwarzenberg").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/schwarzenberg.png"); updateChart(function(e){return e.hustotaObyv > .000120016285})})
+d3.select(".stari").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/stari.png"); updateChart(function(e){return e.vek_prum_top == 1;})})
+d3.select(".mladi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/mladi.png"); updateChart(function(e){return e.vek_prum_top == 2})})
+d3.select(".nezamestnani").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/nezamestnani.png"); updateChart(function(e){return e.mira_nezam_top == 1})})
+d3.select(".zamestnani").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/zamestnani.png"); updateChart(function(e){return e.mira_nezam_top == 2})})
+d3.select(".krimi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/kriminalni.png"); updateChart(function(e){return e.crime_rate_top == 1})})
+d3.select(".nekrimi").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/nekriminalni.png"); updateChart(function(e){return e.crime_rate_top == 2})})
+d3.select(".husti").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/hustota_obyv.png"); updateChart(function(e){return e.hustota_obyv_top == 1})})
+d3.select(".ridci").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/ridke_obyv.png"); updateChart(function(e){return e.hustota_obyv_top == 2})})
+d3.select(".zeman").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/zeman.png"); updateChart(function(e){return e.zeman_prc_top == 1})})
+d3.select(".schwarzenberg").on("click", function() {$("*").removeClass("selected"); $(this).addClass("selected"); $("#mapka img").attr("src", "./img/schwarzenberg.png"); updateChart(function(e){return e.schwarzen_prc_top == 1})})
 </script>
 </body>
 </html>

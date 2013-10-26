@@ -8,7 +8,8 @@ html, body{
 
 text {
 	fill:black;
-	font-size: 8px
+	font-size: 9px
+
 }
 
 #controls {
@@ -72,6 +73,7 @@ var width = 400,
 	height = 400;
 var xvolby = [];
 var scenar2 = [];
+var norm = 130000;
 
 var strany = {"ČSSD":0, "ANO":0, "KSČM":0, "TOP 09":0, "Úsvit":0, "ODS":0, "KDU-ČSL":0, "SZ":0, "ČPS":0, "SSO":0,"SPOZ": 0};
 
@@ -83,7 +85,7 @@ for (partaj in strany) {
 }    
 
 function getColor(party) {
-	return barvy[party]
+	return barvy[party];
 }
 
 var columns = []
@@ -93,7 +95,7 @@ function secondColumn(y) {
 	var a = columns.map(function(e) {
 		return Math.abs(y - e)})
 	for (var i = 0; i < a.length; i++) {
-		if (a[i]<10) {
+		if (a[i] < 10) {
 			dist = 50;
 			break;
 		}
@@ -110,7 +112,7 @@ var svg = d3.select("#slope").append("svg")
 var yscale = d3.scale.pow()
 		.exponent(.25)
 		.domain([0, 30])
-		.range([0, height - 40]);
+		.range([0, height - 20]);
 
 function procenta(filtered) {
 	var celkem = 0
@@ -127,7 +129,7 @@ for (i in strany){strany[i]=0;
 			celkem += soucty[i] 
 		}
 		for (i in soucty){
-			soucty[i] = (soucty[i]/celkem) * 100
+			soucty[i] = (soucty[i]/(celkem + norm) * 100)
 		}
 		for (var k in soucty) {
 			out.push(soucty[k] )
@@ -136,8 +138,9 @@ for (i in strany){strany[i]=0;
 }
 
 function updateChart(podminka) {
+	norm = 0;
 	var vysledkyFilter = xvolby.filter(function(e){return podminka(e)});
-	var scenar = procenta(vysledkyFilter)
+	var scenar = procenta(vysledkyFilter);
 
 	svg.selectAll("text.scenar")
 		.data(scenar)
@@ -146,7 +149,7 @@ function updateChart(podminka) {
 		.attr("y", function(d) { return height - yscale(d)})
 		.attr("style", function(d,i){
 		return "fill:" + getColor(partaje[i]) })
-		.text(function(d,i) {return partaje[i] + " " + Math.round(d) + " %"});		
+		.text(function(d,i) {return partaje[i] + " " + Math.round(d * 10)/10 + " %"});		
 
 	svg.selectAll("line")
 		.data(scenar2)
@@ -161,11 +164,10 @@ function updateChart(podminka) {
 
 d3.csv("volby13.csv", function(error, volby) {
 	xvolby = volby
-	var vysledkyFilter = volby.filter(function(e){return e.vek_prumer > 1});
+	var vysledkyFilter = volby.filter(function(e){return e.crime_rate_top != "alabama"});
 
-	
+	var scenar = procenta(vysledkyFilter)
 	scenar2 = procenta(volby)
-	var scenar = scenar2
 
 svg.selectAll("text.vysledky")
 	.data(scenar2)

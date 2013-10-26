@@ -66,11 +66,16 @@ var scenar2 = [];
 //var strany = {"obcane_cz":0, "liberalove_cz":0, "VV":0, "konzerv_strana":0, "KSCM":0, "koruna_ceska":0, "CSNS":0, "CSSD":0, "narodni_prosperita":0, "sdruzeni_pro_rep":0, "moravane":0, "SPOZ":0, "STOP":0, "TOP09":0, "evropsky_stred":0, "KDU-CSL":0, "cibulka":0, "CS_narod_socialisticka":0, "zeleni":0, "suverenita_bobo":0, "humanisticka_str":0, "pirati":0, "DSSS":0, "svobodni":0, "ODS":0, "klicove_hnuti":0};
 
 var strany = {"VV":0, "konzerv_strana":0, "KSCM":0, "koruna_ceska":0, "CSNS":0, "CSSD":0, "SPOZ":0, "STOP":0, "TOP09":0, "KDU-CSL":0, "zeleni":0, "svobodni":0, "ODS":0};
+var barvy = {"ČSSD": "#f54200", "SSO": "#005340", "ČPS": "#565656", "TOP 09": "#ae2d9f", "HLAV. VZHŮRU": "#a8cbfc", "ODS": "#005091", "Změna": "#76ce29", "KDU-ČSL": "#fed921", "SPOZ": "#30cfe1", "Úsvit": "#f49e00", "DSSS": "#8e5400", "ANO": "#009ee0", "KSČM": "#ce0000", "SZ": "#489422"}
 
 var partaje = []
 for (partaj in strany) {
 	partaje.push(partaj)
 }    
+
+function getColor(party) {
+	return barvy[party]
+}
 
 var columns = []
 
@@ -131,6 +136,8 @@ function updateChart(podminka) {
 		.transition()
 		.duration(700)
 		.attr("y", function(d) { return height - yscale(d)})
+		.attr("style", function(d,i){
+		return "fill:" + getColor(partaje[i]) })
 		.text(function(d,i) {return partaje[i] + " " + Math.round(d) + " %"});		
 
 	svg.selectAll("line")
@@ -140,12 +147,8 @@ function updateChart(podminka) {
 		.attr("y1", function(d) { return height - yscale(d)})
 		.attr("y2", function(d, i) { return height - yscale(scenar[i])})
 		.attr("stroke", function(d, i) {
-			if (d >= scenar[i]) {
-				return "red"
-			} else {
-				return "green"
-			}
-	});
+				getColor(partaje[i])
+			});
 				};
 
 d3.csv("volby10.csv", function(error, volby) {
@@ -161,6 +164,8 @@ svg.selectAll("text.vysledky")
 	.attr("x", function(d) { return 0 + ( secondColumn(height - yscale(d)))})
 	.attr("class", "vysledky")
 	.attr("y", function(d) { return height - yscale(d)})
+	.attr("style", function(d,i){
+		return "fill:" + getColor(partaje[i]) })
 	.text(function(d,i) {return partaje[i] + " " + Math.round(d * 10)/10 + " %"});
 columns = []
 
@@ -168,28 +173,24 @@ columns = []
 svg.selectAll("text.scenar")
 	.data(scenar)
 	.enter().append("text")
-	.attr("x", function(d) { return 270 + ( secondColumn(height - yscale(d)))})
+	.attr("x", function(d) { return 173 + ( secondColumn(height - yscale(d)))})
 	.attr("class", "scenar")
 	.attr("y", function(d) { return height - yscale(d)})
+	.attr("style", function(d,i){
+		return "fill:" + getColor(partaje[i]) })
 	.text(function(d,i) {return partaje[i] + " " + Math.round(d * 10)/ 10 + " %"});		
 
 svg.selectAll("g")
 	.data(scenar2)
 	.enter()
 	.append("line")
-	.attr("x1", 90)
+	.attr("x1", 110)
 	.attr("y1", function(d) { return height - yscale(d)})
-	.attr("x2", 265)
+	.attr("x2", 170)
 	.attr("y2", function(d, i) { return height - yscale(scenar[i])})
 	.attr("stroke-width", 1)
 	.attr("stroke", function(d, i) {
-		if (d > scenar[i]) {
-			return "#D7191C"
-		} else if (d < scenar[i]) {
-			return "#1A9641"
-		} else {
-			return "gray"
-		}
+		return getColor(partaje[i])
 	});
 
 });
